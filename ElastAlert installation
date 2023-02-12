@@ -1,0 +1,168 @@
+ElastAlert installation:
+
+Download:
+•	Reference Link: http://elastalert.readthedocs.org/en/latest/running_elastalert.html
+•	Python is required. If python is installed then execute below command to install setuptools which are required to set-up elastAlert
+$yum install python-setuptools
+
+
+Execute below command to setup EA (ElastAlert)
+	# python setup.py install
+It faces some error in set-up as below
+Searching for blist
+Reading http://pypi.python.org/simple/blist/
+Download error: [Errno -5] No address associated with hostname -- Some packages may not be found!
+Reading http://pypi.python.org/simple/blist/
+Download error: [Errno -5] No address associated with hostname -- Some packages may not be found!
+Couldn't find index page for 'blist' (maybe misspelled?)
+Scanning index of all packages (this may take a while)
+Reading http://pypi.python.org/simple/
+Download error: [Errno -5] No address associated with hostname -- Some packages may not be found!
+No local packages or download links found for blist
+error: Could not find suitable distribution for Requirement.parse('blist')
+
+Above is the issue related to proxy. Need to contact system admin to resolve this. He can provide proxy related information and export commands required.
+After that it will installed successfully.
+Blist installation Issues:
+Yum install gcc
+
+Go to URL: https://pypi.python.org/simple/blist/
+Download blist-1.3.6.tar.gz
+export  https_proxy=https://SMtp-host:port
+export  http_proxy=http://smtp-host:port
+yum install libevent-devel
+yum install python-devel
+
+
+cp ez_setup.py /opt/logstash-elk/elastalert-master/
+python ez_setup.py install >> ez_setup.log
+
+No execute command python setup.py install. 
+It gives error 
+mock requires setuptools>=17.1. Aborting installation
+error: Setup script exited with 1
+To overcome this 
+Download  setuptools 17.1 from https://pypi.python.org/pypi/setuptools/17.1.1#downloads
+Upload it to server using sftp.
+Now extract it to elastalert directory. Go to the directory setuptools-17.1.1
+yum remove python-setuptools
+Execute below command. 
+python ez_setup.py install
+It will install  setuptools 17.1.*
+Now go to elastalert home directory and execute below command to setup elastalert.
+# python setup.py install
+
+
+After successful setup, refer below link to configure elastAlert
+http://elastalert.readthedocs.org/en/latest/running_elastalert.html#running-elastalert-for-the-first-time
+
+[root@hostName elastalert-master]# elastalert-create-index
+Enter elasticsearch host: localhost
+Enter elasticsearch port: 9200
+Use SSL? t/f: f
+Enter optional basic-auth username: 
+Enter optional basic-auth password: 
+Enter optional Elasticsearch URL prefix: 
+New index name? (Default elastalert_status) 
+Name of existing index to copy? (Default None) 
+New index elastalert_status created
+Done!
+
+[root@host-Name elastalert-master]#
+
+This will create index for elastalert
+Command to Run elastAlert for test Rule:
+cd /opt/logstash-elk/elastalert-master/
+$ elastalert-test-rule example_rules/example_frequency.yaml
+
+Command to run elastalert to actually send an email:
+$ python -m elastalert.elastalert --verbose --rule example_frequency.yaml
+
+Reference: 
+http://elastalert.readthedocs.org/en/latest/running_elastalert.html#running-elastalert
+http://elastalert.readthedocs.org/en/latest/running_elastalert.html
+
+Run elastalert from the path other than the module path. 
+
+PYTHONPATH=./python<elastalert-module-path> python -m elastalert.elastalert
+
+
+How does Configuration works?
+1) File: config.yaml OR config.yaml.example
+	This file contains many parameters as below:
+a)	Rules_folder: Directory where the rule file is defined. In case, it will alert_rule/ (e.g. example_rules/example_frequency.yaml)
+b)	ES host and port
+c)	Rule name
+d)	Index
+e)	Timeframe
+f)	Email (smtp server details)
+There are few more parameters. Only important ones are listed here.
+2) 
+
+
+Creating Rule: 
+Sales: 
+•	Go to home directory of elastalert   $ cd /opt/logstash-elk/elastalert-master/
+•	 Create directory to for rule file.  $ sudo mkdir alert_rule
+•	Give admin rights to directory  $sudo chown <username>:<username> alert_rule /
+•	copy example_rules/example_frequency.yaml   to save it as sales_alerts.yaml 
+•	Open the file of edit and change below mentioned attributes values
+index: sales-*
+filter:
+  - query:
+        query_string:  {query: 'Application:sales}
+alert:
+  - "email"
+
+email:
+  - "sunil.chaudhari@myDomain.com"
+ smtp_host: smtp-host'
+ smtp_port: 25
+ smtp_ssl: false
+ from_addr: 'sunil.chaudhari@myDomain.com
+Application:fas* AND type:fas*error
+•	Command to run elastalert to actually send an email:
+	$ python -m elastalert.elastalert --verbose --rule sales_alerts.yaml
+
+FA alerts:
+	Application:fas AND message:Invalid Operation Exception OR message:Communication Exception
+
+
+References: 
+1.	http://stackoverflow.com/questions/11094718/error-command-gcc-failed-with-exit-status-1-while-installing-eventlet
+2.	http://elastalert.readthedocs.org/en/latest/running_elastalert.html#running-elastalert-for-the-first-time
+3.	http://kibana.logstash.es/content/elasticsearch/other/elastalert.html
+4.	https://github.com/krizsan/elastalert-docker/blob/master/Dockerfile
+Filters for Rule
+5.	http://elastalert.readthedocs.org/en/latest/recipes/writing_filters.html#wildcard
+
+
+Installation of Supervisor for monitoring elastalert logs.
+yum install supervisor
+
+
+
+2776  sudo cp -r blist-1.3.6-py2.6-linux-x86_64.egg/ /home/myUserName/
+ 2777  sudo cp -r boto-2.38.0-py2.6.egg/ /home/myUserName/
+2779  sudo cp -r python_dateutil-2.4.2-py2.6.egg /home/myUserName/
+ 2780  sudo cp -r mock-1.3.0-py2.6.egg/  /home/myUserName/
+ 2781  sudo cp -r argparse  /home/myUserName/
+ 2782  sudo cp -r argparse-1.4.0.dist-info/  /home/myUserName/
+ 2783  sudo cp -r argparse.py  /home/myUserName/
+ 2784  sudo cp -r jsonschema-2.5.1-py2.6.egg/  /home/myUserName/
+2788  sudo cp -r PyStaticConfiguration-0.9.0-py2.6.egg  /home/myUserName/
+2790  sudo cp -r jira-0.32-py2.6.egg  /home/myUserName/
+2792  sudo cp -r PyYAML-3.11-py2.6-linux-x86_64.egg  /home/myUserName/
+ 2793  sudo cp -r elasticsearch-2.1.0-py2.6.egg  /home/myUserName/
+ 2794  sudo cp -r oauthlib-1.0.3-py2.6.egg  /home/myUserName/
+ 2795  sudo cp -r requests-2.9.0-py2.6.egg/  /home/myUserName/
+ 2796  sudo cp -r requests_oauthlib-0.6.0-py2.6.egg/  /home/myUserName/
+
+ 2797  sudo cp -r unittest2  /home/myUserName/
+ 2798  sudo cp -r urllib3  /home/myUserName/
+2800  sudo cp -r six-1.10.0-py2.6.egg  /home/myUserName/
+ 2801  sudo cp -r supervisor  /home/myUserName/
+ 2802  sudo cp -r tlslite-0.4.9-py2.6.egg  /home/myUserName/
+
+
+https://engineeringblog.yelp.com/2016/03/elastalert-part-two.html
